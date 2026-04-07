@@ -2,117 +2,395 @@
 <html lang="id" data-bs-theme="light">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Portal Absensi Les - Smart System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Portal Absensi Les - Modern UI ✨</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
 
     <style>
+      /* VARIABEL TEMA ASLI - TIDAK DIUBAH */
       :root {
-        --primary-color: #0084ff; --primary-hover: #0070d9; --bg-color: #f8fafd;
-        --card-bg: #ffffff; --text-main: #1e293b; --text-muted: #64748b;
-        --border-color: #e2e8f0; --sidebar-width: 260px;
+        --primary-color: #0084ff;
+        --primary-hover: #0070d9;
+        --bg-color: #f8fafd;
+        --card-bg: #ffffff;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --border-color: #e2e8f0;
+        --sidebar-width: 260px;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
       }
-      body { font-family: "Nunito", sans-serif; background-color: var(--bg-color); color: var(--text-main); overflow-x: hidden; }
-      #sidebar { width: var(--sidebar-width); position: fixed; top: 0; left: 0; height: 100vh; background-color: var(--card-bg); border-right: 1px solid var(--border-color); z-index: 1040; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; }
-      .sidebar-header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; }
-      .brand-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary-color), #3b82f6); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; }
-      .nav-menu { padding: 1rem 0.75rem; flex-grow: 1; overflow-y: auto; }
+
+      [data-bs-theme="dark"] {
+        --bg-color: #0f172a;
+        --card-bg: #1e293b;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --border-color: #334155;
+      }
+
+      body {
+        font-family: "Nunito", sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        transition: background-color 0.3s, color 0.3s;
+        overflow-x: hidden;
+      }
+
+      /* Sidebar Styles */
+      #sidebar {
+        width: var(--sidebar-width);
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        background-color: var(--card-bg);
+        border-right: 1px solid var(--border-color);
+        z-index: 1040;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .sidebar-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .brand-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+      }
+      .nav-menu {
+        padding: 1rem 0.75rem;
+        flex-grow: 1;
+        overflow-y: auto;
+      }
       .nav-item { margin-bottom: 0.25rem; }
-      .nav-link { color: var(--text-muted); padding: 0.8rem 1rem; border-radius: 10px; display: flex; align-items: center; gap: 12px; font-weight: 600; text-decoration: none; }
-      .nav-link:hover { background-color: rgba(0, 132, 255, 0.05); color: var(--primary-color); }
-      .nav-link.active { background-color: var(--primary-color); color: white; }
-      #main-content { margin-left: var(--sidebar-width); min-height: 100vh; display: flex; flex-direction: column; }
-      .top-header { background-color: var(--card-bg); border-bottom: 1px solid var(--border-color); padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1030; }
-      .content-area { padding: 1.5rem; flex-grow: 1; padding-bottom: 90px; }
-      .custom-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; margin-bottom: 1.5rem; overflow: hidden; }
-      .card-header-custom { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); background-color: rgba(0, 0, 0, 0.02); font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
-      .stat-card { padding: 1.5rem; border-radius: 16px; color: white; position: relative; overflow: hidden; }
+      .nav-link {
+        color: var(--text-muted);
+        padding: 0.8rem 1rem;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 600;
+        transition: all 0.2s;
+        text-decoration: none;
+      }
+      .nav-link:hover {
+        background-color: rgba(0, 132, 255, 0.05);
+        color: var(--primary-color);
+      }
+      .nav-link.active {
+        background-color: var(--primary-color);
+        color: white;
+        box-shadow: 0 4px 6px -1px rgba(0, 132, 255, 0.3);
+      }
+
+      /* Main Content Styles */
+      #main-content {
+        margin-left: var(--sidebar-width);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        transition: margin-left 0.3s;
+      }
+      .top-header {
+        background-color: var(--card-bg);
+        border-bottom: 1px solid var(--border-color);
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 1030;
+        backdrop-filter: blur(10px);
+        background-color: rgba(var(--card-bg-rgb), 0.9);
+      }
+      .content-area {
+        padding: 1.5rem;
+        flex-grow: 1;
+        padding-bottom: 90px;
+      }
+
+      /* Card & Element Styles */
+      .custom-card {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+      }
+      .card-header-custom {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        background-color: rgba(0, 0, 0, 0.02);
+        font-weight: 700;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .stat-card {
+        padding: 1.5rem;
+        border-radius: 16px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+      }
       .stat-card.blue { background: linear-gradient(135deg, #0084ff, #3b82f6); }
       .stat-card.green { background: linear-gradient(135deg, #10b981, #059669); }
-      .form-control, .form-select { background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.6rem 1rem; }
-      .input-icon-wrapper { position: relative; width: 100%; }
-      .input-icon-wrapper i { position: absolute; top: 50%; transform: translateY(-50%); left: 1rem; color: var(--text-muted); z-index: 5; }
+      .stat-card.orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
+      .stat-card.purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+      .stat-icon {
+        position: absolute;
+        right: -10px;
+        bottom: -20px;
+        font-size: 6rem;
+        opacity: 0.15;
+      }
+
+      /* Form Controls & Icons Menyatu */
+      .form-control, .form-select {
+        background-color: var(--bg-color);
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+        border-radius: 10px;
+        padding: 0.6rem 1rem;
+      }
+      .form-control:focus, .form-select:focus {
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(0, 132, 255, 0.25);
+      }
+      .input-icon-wrapper {
+        position: relative;
+        width: 100%;
+      }
+      .input-icon-wrapper i {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        left: 1rem;
+        color: var(--text-muted);
+        pointer-events: none;
+        z-index: 5;
+      }
       .input-icon-wrapper .form-control { padding-left: 2.75rem; }
-      .table th { background-color: rgba(0, 0, 0, 0.02); font-weight: 600; padding: 1rem; }
-      .table td { padding: 1rem; vertical-align: middle; }
-      
-      #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-      
-      #reader-container { display: none; position: relative; width: 100%; max-width: 400px; margin: auto; border-radius: 12px; overflow: hidden; border: 3px solid var(--primary-color); background: #000; }
-      #video { width: 100%; height: auto; display: block; }
-      .scan-line { position: absolute; width: 100%; height: 3px; background: #00ff00; top: 50%; left: 0; box-shadow: 0 0 15px #00ff00; animation: scan 2s infinite linear; }
-      @keyframes scan { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
-      
+
+      input[type="date"], input[type="month"], input[type="time"] {
+        position: relative;
+        color: var(--text-main) !important;
+      }
+      input[type="date"]::-webkit-calendar-picker-indicator,
+      input[type="month"]::-webkit-calendar-picker-indicator,
+      input[type="time"]::-webkit-calendar-picker-indicator {
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        width: auto; height: auto; color: transparent;
+        background: transparent; cursor: pointer;
+      }
+
+      /* Table Styles */
+      .table-responsive { border-radius: 0 0 16px 16px; }
+      .table { margin-bottom: 0; color: var(--text-main); }
+      .table th {
+        background-color: rgba(0, 0, 0, 0.02);
+        border-bottom-width: 2px;
+        border-color: var(--border-color);
+        font-weight: 600;
+        padding: 1rem;
+        white-space: nowrap;
+      }
+      .table td { border-color: var(--border-color); padding: 1rem; vertical-align: middle; }
+
+      .table-compact td, .table-compact th {
+        padding: 0.5rem; font-size: 0.9rem;
+      }
+
+      .dropdown-menu-checkboxes { max-height: 250px; overflow-y: auto; }
+      .dropdown-menu-checkboxes .form-check { margin: 0; padding: 0.5rem 1rem 0.5rem 2.5rem; cursor: pointer; }
+      .dropdown-menu-checkboxes .form-check:hover { background-color: rgba(0, 132, 255, 0.05); }
+
+      /* Animations & Transitions */
+      .fade-transition {
+        transition: opacity 0.5s ease, transform 0.5s ease;
+        opacity: 1; transform: translateY(0);
+      }
+      .fade-out {
+        opacity: 0; transform: translateY(-20px); pointer-events: none;
+        position: absolute; width: 100%; visibility: hidden;
+      }
+
+      /* ID Card Print Template */
+      .id-card-container {
+        width: 85.6mm; height: 53.98mm;
+        background: linear-gradient(135deg, var(--card-bg), var(--bg-color));
+        border: 2px solid var(--primary-color);
+        border-radius: 10px; position: relative; padding: 15px;
+        display: flex; align-items: center; gap: 15px; margin: 0 auto;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); overflow: hidden;
+      }
+      .id-card-qr {
+        width: 100px; height: 100px; background: white; padding: 5px;
+        border-radius: 8px; border: 1px solid var(--border-color);
+      }
+      .id-card-details { flex: 1; text-align: left; z-index: 2; }
+      .id-card-bg-icon {
+        position: absolute; right: -20px; bottom: -20px; font-size: 100px;
+        opacity: 0.05; color: var(--primary-color); z-index: 1;
+      }
+
+      /* MOBILE APP-LIKE BOTTOM NAVIGATION */
+      .bottom-nav { display: none; }
       @media (max-width: 768px) {
         #sidebar { transform: translateX(-100%); z-index: 1060; }
-        #sidebar.show { transform: translateX(0); }
+        #sidebar.show { transform: translateX(0); box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
         #main-content { margin-left: 0; }
+        .bottom-nav {
+          display: flex; position: fixed; bottom: 0; left: 0; right: 0; height: 70px;
+          background-color: var(--card-bg); border-top: 1px solid var(--border-color);
+          z-index: 1050; justify-content: space-around; align-items: center; padding: 0 10px;
+        }
+        .nav-item-bottom {
+          display: flex; flex-direction: column; align-items: center; justify-content: center;
+          color: var(--text-muted); text-decoration: none; font-size: 0.75rem; font-weight: 600;
+          flex: 1; transition: color 0.3s; background: none; border: none; padding: 0;
+        }
+        .nav-item-bottom.active { color: var(--primary-color); }
+        .nav-item-bottom i { font-size: 1.4rem; margin-bottom: 2px; }
+        .nav-scanner-center {
+          width: 65px; height: 65px; background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+          color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+          font-size: 2rem; position: relative; top: -25px; box-shadow: 0 6px 15px rgba(0, 132, 255, 0.4);
+          border: 5px solid var(--bg-color); transition: transform 0.2s;
+        }
+        .nav-scanner-center:active { transform: scale(0.95); }
+        .mobile-overlay {
+          display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(0, 0, 0, 0.5); z-index: 1055; backdrop-filter: blur(3px);
+        }
+        .mobile-overlay.show { display: block; }
       }
     </style>
   </head>
   <body>
-    <!-- LOADING SCREEN -->
-    <div id="loadingOverlay">
-      <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
-      <h5 class="fw-bold">Menghubungkan ke API...</h5>
-      <p class="text-muted small" id="loadingText">Mengambil data dari Google Server</p>
-    </div>
-
+    <!-- DATALIST SUGGESTIONS -->
     <datalist id="listSiswaSuggestion"></datalist>
 
-    <!-- PORTAL WALI -->
+    <!-- ============================================== -->
+    <!-- 1. PORTAL WALI (LANDING PAGE)                  -->
+    <!-- ============================================== -->
     <div id="portal-wali" class="min-vh-100 position-relative" style="background: var(--bg-color)">
       <div class="p-3 d-flex justify-content-between align-items-center bg-transparent position-absolute w-100 z-3">
         <div class="d-flex align-items-center gap-2">
           <div class="brand-icon" style="width: 35px; height: 35px"><i class="bi bi-rocket-takeoff-fill"></i></div>
-          <h5 class="m-0 fw-bold">Smart<span class="text-primary">Absen</span></h5>
+          <h5 class="m-0 fw-bold">Smart<span class="text-primary">Absen</span><small class="text-muted fw-normal">| Portal Wali</small></h5>
         </div>
-        <button class="btn btn-outline-primary rounded-pill px-4 fw-bold" onclick="showAdminLogin()"><i class="bi bi-person-lock"></i> Login Admin</button>
+        <button class="btn btn-outline-primary rounded-pill px-4 fw-bold" onclick="showAdminPortal()">
+          <i class="bi bi-person-lock"></i> Login Admin
+        </button>
       </div>
 
-      <div id="pw-search-view" class="min-vh-100 d-flex align-items-center justify-content-center flex-column px-3 pt-5">
+      <!-- Halaman Pencarian (Default) -->
+      <div id="pw-search-view" class="fade-transition min-vh-100 d-flex align-items-center justify-content-center flex-column px-3 pt-5">
         <div class="text-center mb-5">
-          <img src="https://cdn-icons-png.flaticon.com/512/3238/3238015.png" width="120" class="mb-3 opacity-75" />
-          <h2 class="fw-bold">Pantau Kehadiran</h2>
+          <img src="https://cdn-icons-png.flaticon.com/512/3238/3238015.png" alt="Portal Wali" width="120" class="mb-3 opacity-75"/>
+          <h2 class="fw-bold">Pantau Kehadiran Anak Anda</h2>
+          <p class="text-muted">Masukkan Nama Siswa untuk melihat rincian kehadiran dan tagihan.</p>
         </div>
+
         <div class="custom-card p-4 shadow-sm" style="max-width: 500px; width: 100%">
           <div class="input-icon-wrapper mb-3">
             <i class="bi bi-search"></i>
-            <input type="text" id="inputCariWali" list="listSiswaSuggestion" class="form-control" placeholder="Ketik nama siswa..." />
+            <input type="text" id="inputCariWali" list="listSiswaSuggestion" class="form-control" placeholder="Ketik nama siswa..." onkeydown="if (event.key === 'Enter') cariDataWali();" />
           </div>
-          <button class="btn btn-primary w-100 py-2 fw-bold fs-5" onclick="cariDataWali()">Cari Data</button>
+          <button class="btn btn-primary w-100 py-2 fw-bold fs-5" onclick="cariDataWali()">Lihat Data Kehadiran</button>
         </div>
       </div>
 
-      <div id="pw-detail-view" class="d-none min-vh-100 w-100 pt-5 px-3 pb-5" style="max-width: 1000px; margin: 0 auto; padding-top: 80px !important">
-        <button class="btn btn-light mb-4" onclick="kembaliKeSearch()"><i class="bi bi-arrow-left"></i> Kembali</button>
+      <!-- Halaman Hasil / Detail (Transisi) -->
+      <div id="pw-detail-view" class="fade-transition fade-out min-vh-100 w-100 pt-5 px-3 pb-5" style="max-width: 1000px; margin: 0 auto; padding-top: 80px !important">
+        <button class="btn btn-light mb-4" onclick="kembaliKeSearch()"><i class="bi bi-arrow-left"></i> Kembali ke Pencarian</button>
+
         <div class="row g-4 mb-4">
           <div class="col-md-7">
             <div class="custom-card p-4 h-100 d-flex align-items-center gap-4">
-              <img src="" class="rounded border p-1" width="80" id="pw-qr" />
-              <div><h3 class="fw-bold m-0" id="pw-nama">-</h3><p class="text-muted m-0">ID: <span id="pw-id">-</span></p></div>
+              <img id="pw-qr" src="" alt="QR" class="rounded border p-1" width="80" />
+              <div>
+                <h3 class="fw-bold m-0" id="pw-nama">-</h3>
+                <p class="text-muted m-0"><i class="bi bi-person-badge"></i> ID: <span id="pw-id">-</span> | Jenjang: <span id="pw-jenjang">-</span></p>
+              </div>
             </div>
           </div>
           <div class="col-md-5">
             <div class="custom-card p-4 h-100 d-flex flex-column justify-content-center">
-              <label class="fw-bold mb-2">Bulan</label>
-              <input type="month" class="form-control form-control-lg" id="pw-filter-bulan" onchange="renderDataWali()" />
+              <label class="fw-bold mb-2">Pilih Bulan Kehadiran</label>
+              <div class="input-icon-wrapper">
+                <i class="bi bi-calendar-month"></i>
+                <input type="month" class="form-control form-control-lg" id="pw-filter-bulan" onchange="renderDataWali()" />
+              </div>
             </div>
           </div>
         </div>
+
+        <!-- Ringkasan -->
         <div class="row g-3 mb-4">
-          <div class="col-md-4"><div class="custom-card p-3 border-start border-4 border-primary"><p class="text-muted mb-1 small">Reguler</p><h3 class="m-0 fw-bold" id="pw-sum-reguler">Rp 0</h3></div></div>
-          <div class="col-md-4"><div class="custom-card p-3 border-start border-4 border-warning"><p class="text-muted mb-1 small">Overtime</p><h3 class="m-0 fw-bold" id="pw-sum-overtime">Rp 0</h3></div></div>
-          <div class="col-md-4"><div class="custom-card p-3 border-start border-4 border-danger"><p class="text-danger mb-1 small">Total</p><h3 class="m-0 fw-bold text-danger" id="pw-sum-total">Rp 0</h3></div></div>
+          <div class="col-md-4">
+            <div class="custom-card p-3 border-start border-4 border-primary">
+              <p class="text-muted mb-1 small fw-bold text-uppercase">Total Reguler (Nominal)</p>
+              <h3 class="m-0 fw-bold" id="pw-sum-reguler">Rp 0</h3>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="custom-card p-3 border-start border-4 border-warning">
+              <p class="text-muted mb-1 small fw-bold text-uppercase">Total Overtime (Nominal)</p>
+              <h3 class="m-0 fw-bold" id="pw-sum-overtime">Rp 0</h3>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="custom-card p-3 border-start border-4 border-danger bg-danger-subtle">
+              <p class="text-danger mb-1 small fw-bold text-uppercase">Estimasi Tagihan Total</p>
+              <h3 class="m-0 fw-bold text-danger" id="pw-sum-total">Rp 0</h3>
+            </div>
+          </div>
         </div>
+
         <div class="custom-card">
+          <div class="card-header-custom">Rincian Kehadiran Anak</div>
           <div class="table-responsive">
             <table class="table table-hover">
-              <thead><tr><th>Waktu</th><th>Tipe</th><th>Tarif</th></tr></thead>
+              <thead><tr><th>Hari, Tanggal & Waktu</th><th>Tipe Kehadiran</th><th>Tarif Kehadiran</th></tr></thead>
               <tbody id="pw-tabel-rincian"></tbody>
             </table>
           </div>
@@ -120,237 +398,594 @@
       </div>
     </div>
 
-    <!-- PORTAL ADMIN -->
+    <!-- ============================================== -->
+    <!-- 2. PORTAL ADMIN (DASHBOARD UTAMA)              -->
+    <!-- ============================================== -->
     <div id="portal-admin" class="d-none">
+      <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
+
       <aside id="sidebar">
         <div class="sidebar-header">
           <div class="brand-icon"><i class="bi bi-rocket-takeoff-fill"></i></div>
-          <h5 class="m-0 fw-bold">Admin</h5>
+          <h5 class="m-0 fw-bold">Smart<span class="text-primary">Absen</span></h5>
+          <button class="btn btn-sm btn-light d-md-none ms-auto" onclick="toggleSidebar()"><i class="bi bi-x-lg"></i></button>
         </div>
-        <div class="nav-menu">
-          <div class="nav-item"><a href="#" class="nav-link active" onclick="switchMenu('menu-dashboard', this)"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a></div>
-          <div class="nav-item"><a href="#" class="nav-link" onclick="switchMenu('menu-absen', this)"><i class="bi bi-qr-code-scan"></i> Scanner</a></div>
-          <div class="nav-item"><a href="#" class="nav-link" onclick="switchMenu('menu-siswa', this)"><i class="bi bi-people-fill"></i> Siswa</a></div>
-          <div class="nav-item"><a href="#" class="nav-link text-danger" onclick="logoutAdmin()"><i class="bi bi-box-arrow-left"></i> Logout</a></div>
+
+        <div class="nav-menu" id="admin-nav-menu">
+          <div class="small text-muted fw-bold mb-2 px-3 text-uppercase">Menu Utama</div>
+          <div class="nav-item" data-access="dashboard"><a href="#" class="nav-link active" onclick="switchMenu('menu-dashboard', this)"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a></div>
+          <div class="nav-item" data-access="absen"><a href="#" class="nav-link" onclick="switchMenu('menu-absen', this)"><i class="bi bi-qr-code-scan"></i> Absensi Scanner</a></div>
+
+          <div class="small text-muted fw-bold mt-4 mb-2 px-3 text-uppercase">Manajemen Data</div>
+          <div class="nav-item" data-access="siswa"><a href="#" class="nav-link" onclick="switchMenu('menu-siswa', this)"><i class="bi bi-people-fill"></i> Data Siswa</a></div>
+          <div class="nav-item" data-access="tarif"><a href="#" class="nav-link" onclick="switchMenu('menu-tarif', this)"><i class="bi bi-tags-fill"></i> Pengaturan Tarif</a></div>
+
+          <div class="small text-muted fw-bold mt-4 mb-2 px-3 text-uppercase">Laporan & Riwayat</div>
+          <div class="nav-item" data-access="log"><a href="#" class="nav-link" onclick="switchMenu('menu-log', this)"><i class="bi bi-clock-history"></i> Log Kehadiran</a></div>
+          <div class="nav-item" data-access="laporan"><a href="#" class="nav-link" onclick="switchMenu('menu-laporan', this)"><i class="bi bi-receipt"></i> Laporan & Invoice</a></div>
+
+          <div class="small text-muted fw-bold mt-4 mb-2 px-3 text-uppercase">Sistem</div>
+          <div class="nav-item" data-access="role"><a href="#" class="nav-link" onclick="switchMenu('menu-role', this)"><i class="bi bi-shield-lock-fill"></i> Manajemen Role</a></div>
+          <div class="nav-item"><a href="#" class="nav-link text-danger" onclick="logoutAdmin()"><i class="bi bi-box-arrow-left"></i> Logout ke Wali</a></div>
         </div>
       </aside>
 
       <main id="main-content">
+        <header class="top-header">
+          <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-light d-md-none" onclick="toggleSidebar()"><i class="bi bi-list fs-5"></i></button>
+            <h4 class="m-0 fw-bold d-none d-sm-block" id="pageTitle">Dashboard</h4>
+          </div>
+
+          <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-outline-primary btn-sm d-none d-md-block" onclick="loadDataAdmin(true)"><i class="bi bi-arrow-clockwise"></i> Refresh Data</button>
+            <div id="realtime-clock" class="fw-bold text-primary d-none d-sm-block"></div>
+            <button class="btn btn-light rounded-circle" onclick="toggleTheme()" id="themeToggleBtn"><i class="bi bi-moon-fill"></i></button>
+          </div>
+        </header>
+
         <div class="content-area">
+          <!-- DASHBOARD -->
           <div id="menu-dashboard" class="menu-section">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+              <h5 class="fw-bold m-0">Ringkasan Sistem</h5>
+              <div class="d-flex align-items-center bg-white px-3 py-1 rounded-pill border">
+                <i class="bi bi-calendar-event text-primary me-2"></i>
+                <input type="month" class="form-control form-control-sm border-0 bg-transparent shadow-none px-0" style="width: 120px" id="dashBulan" onchange="updateDashboardView()" />
+              </div>
+            </div>
             <div class="row g-4 mb-4">
-              <div class="col-6"><div class="stat-card blue"><h6 class="mb-1">Total Siswa</h6><h3 class="m-0" id="dash-siswa">0</h3></div></div>
-              <div class="col-6"><div class="stat-card green"><h6 class="mb-1">Total Absen</h6><h3 class="m-0" id="dash-absen">0</h3></div></div>
-            </div>
-            <div class="custom-card">
-              <div class="card-header-custom">Aktivitas Terakhir</div>
-              <table class="table"><tbody id="dash-aktivitas"></tbody></table>
+              <div class="col-md-3 col-6">
+                <div class="stat-card blue">
+                  <i class="bi bi-people-fill stat-icon"></i><h6 class="fw-bold mb-1">Total Siswa</h6>
+                  <h3 class="m-0 fw-bold" id="dashSiswa">0</h3>
+                </div>
+              </div>
+              <div class="col-md-3 col-6">
+                <div class="stat-card green">
+                  <i class="bi bi-check-circle-fill stat-icon"></i><h6 class="fw-bold mb-1">Hadir (Hari Ini)</h6>
+                  <h3 class="m-0 fw-bold" id="dashHadir">0</h3>
+                </div>
+              </div>
+              <div class="col-md-3 col-6">
+                <div class="stat-card orange">
+                  <i class="bi bi-clock-fill stat-icon"></i><h6 class="fw-bold mb-1">Sesi Overtime (Bulan)</h6>
+                  <h3 class="m-0 fw-bold" id="dashOvertime">0</h3>
+                </div>
+              </div>
+              <div class="col-md-3 col-6">
+                <div class="stat-card purple">
+                  <i class="bi bi-cash-stack stat-icon"></i><h6 class="fw-bold mb-1">Est. Pemasukan</h6>
+                  <h3 class="m-0 fw-bold fs-4" id="dashIncome">Rp 0</h3>
+                </div>
+              </div>
             </div>
           </div>
 
+          <!-- ABSENSI SCANNER -->
           <div id="menu-absen" class="menu-section d-none">
-             <div class="custom-card p-4 text-center">
-                 <button class="btn btn-primary mb-3 w-100" onclick="initScanner()" id="btnMulaiKamera">Mulai Kamera QR</button>
-                 <button class="btn btn-danger mb-3 w-100 d-none" onclick="stopScanner()" id="btnStopKamera">Tutup Kamera</button>
-                 
-                 <div id="reader-container">
-                    <video id="video" playsinline></video><div class="scan-line"></div>
-                 </div>
-                 <canvas id="canvasElement" hidden></canvas>
-
-                 <hr>
-                 <input type="text" id="manualSiswa" list="listSiswaSuggestion" class="form-control mb-2" placeholder="Nama Siswa">
-                 <select id="manualTipe" class="form-control mb-3"><option value="Hadir">Hadir</option><option value="Overtime">Overtime</option></select>
-                 <button class="btn btn-dark w-100" onclick="simpanManual()">Catat Manual</button>
-             </div>
+            <div class="row justify-content-center">
+              <div class="col-md-8 col-lg-6">
+                <div class="custom-card p-3">
+                  <ul class="nav nav-pills nav-fill mb-3" role="tablist">
+                    <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#nav-qr" onclick="initScanner()"><i class="bi bi-qr-code"></i> Scan QR</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#nav-manual" onclick="stopScanner()"><i class="bi bi-keyboard"></i> Manual</button></li>
+                  </ul>
+                  <div class="tab-content">
+                    <div class="tab-pane fade show active text-center" id="nav-qr">
+                      <button class="btn btn-outline-primary mb-3" onclick="initScanner()" id="btnMulaiKamera"><i class="bi bi-camera-video"></i> Mulai Kamera Scanner</button>
+                      <div id="reader" style="width: 100%; min-height: 300px; margin: auto"></div>
+                    </div>
+                    <div class="tab-pane fade p-3" id="nav-manual">
+                      <div class="mb-3">
+                        <label class="form-label fw-bold">Nama Siswa / ID</label>
+                        <div class="input-icon-wrapper mb-3">
+                          <i class="bi bi-person"></i>
+                          <input type="text" class="form-control" list="listSiswaSuggestion" id="manualSiswa" placeholder="Ketik nama siswa..." />
+                        </div>
+                        <label class="form-label fw-bold">Tipe Kehadiran</label>
+                        <select class="form-select mb-3" id="manualTipe" onchange="toggleManualOvertime(this.value)">
+                          <option value="Hadir">Reguler (Hadir)</option>
+                          <option value="Overtime">Khusus / Overtime</option>
+                        </select>
+                        <div id="wrapManualOvertime" class="d-none">
+                          <label class="form-label fw-bold">Nominal Overtime (Kustom)</label>
+                          <div class="input-icon-wrapper mb-3">
+                            <i class="bi bi-cash"></i>
+                            <input type="number" class="form-control" id="manualNominalOvertime" placeholder="Kosongi untuk ikut Tarif Otomatis" />
+                          </div>
+                        </div>
+                      </div>
+                      <button class="btn btn-primary w-100 py-2 fw-bold" onclick="simpanAbsenManual()"><i class="bi bi-check-circle"></i> Catat Kehadiran</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
+          <!-- DATA SISWA -->
           <div id="menu-siswa" class="menu-section d-none">
-             <div class="custom-card">
-                 <div class="table-responsive">
-                    <table class="table">
-                        <thead><tr><th>ID</th><th>Nama</th><th>Wali/HP</th><th>Jenjang</th></tr></thead>
-                        <tbody id="body-tabel-siswa"></tbody>
-                    </table>
-                 </div>
-             </div>
+            <div class="custom-card">
+              <div class="card-header-custom"><span>Daftar Siswa Les</span></div>
+              <div class="table-responsive">
+                <table class="table table-hover" id="tabelSiswa">
+                  <thead><tr><th>ID</th><th>Nama Siswa</th><th>Wali / HP</th><th>Jenjang</th><th>Aksi</th></tr></thead>
+                  <tbody id="body-tabel-siswa"></tbody>
+                </table>
+              </div>
+            </div>
           </div>
+
+          <!-- PENGATURAN TARIF -->
+          <div id="menu-tarif" class="menu-section d-none">
+            <div class="custom-card">
+              <div class="card-header-custom"><span>Daftar Grup Tarif Otomatis</span></div>
+              <div class="table-responsive">
+                <table class="table table-hover" id="tabelTarif">
+                  <thead><tr><th>Nama Grup Tarif</th><th>Hari Berlaku</th><th>Tarif Reguler</th><th>Tarif Overtime</th></tr></thead>
+                  <tbody id="body-tabel-tarif"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- LOG KEHADIRAN -->
+          <div id="menu-log" class="menu-section d-none">
+            <div class="custom-card">
+              <div class="card-header-custom">Riwayat Presensi</div>
+              <div class="p-3 border-bottom">
+                <div class="row g-2">
+                  <div class="col-md-6"><div class="input-icon-wrapper"><i class="bi bi-calendar-month"></i><input type="month" id="searchLogBulan" class="form-control" onchange="filterLog()"/></div></div>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover" id="tabelLog">
+                  <thead><tr><th>Tanggal</th><th>Nama Siswa</th><th>Tipe</th><th>Nominal</th></tr></thead>
+                  <tbody id="body-tabel-log"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- LAPORAN & INVOICE -->
+          <div id="menu-laporan" class="menu-section d-none">
+            <div class="custom-card">
+              <div class="card-header-custom">Rekapitulasi & Tagihan</div>
+              <div class="p-3 border-bottom bg-light">
+                <div class="input-icon-wrapper"><i class="bi bi-calendar-month"></i><input type="month" id="searchLapBulan" class="form-control bg-white" onchange="filterLaporan()"/></div>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover" id="tabelInvoice">
+                  <thead><tr><th>Siswa</th><th>Total Reguler</th><th>Total Overtime</th><th>Tagihan</th><th>Aksi</th></tr></thead>
+                  <tbody id="body-tabel-laporan"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
         </div>
       </main>
+
+      <!-- MOBILE BOTTOM NAVIGATION -->
+      <nav class="bottom-nav d-md-none" id="mobile-bottom-nav">
+        <button class="nav-item-bottom active" onclick="switchMenu('menu-dashboard', this); setActiveBottomNav(this);"><i class="bi bi-grid-1x2-fill"></i> Home</button>
+        <button class="nav-item-bottom" onclick="switchMenu('menu-siswa', this); setActiveBottomNav(this);"><i class="bi bi-people-fill"></i> Siswa</button>
+        <button class="nav-scanner-center" onclick="switchMenu('menu-absen'); setTimeout(initScanner, 500); setActiveBottomNav(null);"><i class="bi bi-qr-code-scan"></i></button>
+        <button class="nav-item-bottom" onclick="switchMenu('menu-log', this); setActiveBottomNav(this);"><i class="bi bi-clock-history"></i> Log</button>
+        <button class="nav-item-bottom" onclick="toggleSidebar()"><i class="bi bi-list"></i> Menu</button>
+      </nav>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      // =======================================================================
-      // 1. GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE APPS SCRIPT-MU !!!
-      // =======================================================================
-      const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzOtDFXKL1CZkyTsGOZd5fSVLvJjiMGRB9jvAZMl5TRDtJI7R5bMBXhvaQqEnJE-Kpy/exec";
-      
-      let dataSiswa = [], dataTarif = [], dataLog = [];
+    <!-- Modal ID Card (Khusus Cetak QR) -->
+    <div class="modal fade" id="modalIDCard" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content" style="background-color: var(--card-bg)">
+            <div class="modal-header border-0 pb-0">
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center pb-4">
+              <div class="id-card-container" id="printable-id-card">
+                <i class="bi bi-rocket-takeoff-fill id-card-bg-icon"></i>
+                <div class="id-card-details">
+                  <h5 class="fw-bold m-0" style="color: var(--primary-color)">SmartAbsen</h5>
+                  <h6 class="fw-bold m-0 text-dark" id="idcard-nama">-</h6>
+                  <div class="text-dark" style="font-size: 0.75rem"><strong id="idcard-id">-</strong></div>
+                  <div class="text-dark" style="font-size: 0.7rem; margin-top: 5px" id="idcard-jenjang">-</div>
+                </div>
+                <div class="id-card-qr"><img id="idcard-qr-img" src="" width="100%" height="100%" alt="QR" /></div>
+              </div>
+              <button class="btn btn-primary w-100 mt-4" onclick="cetakIDCard()"><i class="bi bi-printer"></i> Cetak Kartu</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      window.onload = function () {
-        document.getElementById("pw-filter-bulan").value = new Date().toISOString().slice(0, 7);
-        fetchBackendData();
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      // =========================================================
+      // KONFIGURASI URL API (GANTI DENGAN URL WEB APP GAS ANDA)
+      // =========================================================
+      const SCRIPT_URL = 'URL_GAS_ANDA_DISINI'; 
+
+      // State Memory
+      let STATE = {
+        siswa: [],
+        tarif: [],
+        log: [],
+        currentWaliLog: []
       };
 
-      // FUNGSI KOMUNIKASI FETCH API (Pengganti google.script.run)
-      async function apiCall(action, payload = {}) {
-        try {
-            // Menggunakan method POST dan mengubah object JSON menjadi string
-            // Kita tidak menggunakan Content-Type application/json agar tidak terblokir CORS preflight
-            const response = await fetch(GAS_API_URL, {
-                method: "POST",
-                body: JSON.stringify({ action: action, ...payload })
-            });
-            const result = await response.json();
-            if (result.status === "error") throw new Error(result.message);
-            return result.data;
-        } catch (error) {
-            console.error("API Error:", error);
-            throw error;
-        }
-      }
+      window.onload = function () {
+        const curMonth = new Date().toISOString().slice(0, 7);
+        document.getElementById("dashBulan").value = curMonth;
+        document.getElementById("pw-filter-bulan").value = curMonth;
+        document.getElementById("searchLogBulan").value = curMonth;
+        document.getElementById("searchLapBulan").value = curMonth;
 
-      async function fetchBackendData() {
-        try {
-            const data = await apiCall("getAppData");
-            dataSiswa = data.siswa || [];
-            dataTarif = data.tarif || [];
-            dataLog = data.log || [];
-            
-            document.getElementById("loadingOverlay").style.display = "none";
-            renderSuggestions(); renderTabelSiswa(); renderDashboard();
-        } catch (error) {
-            document.getElementById("loadingOverlay").innerHTML = `
-              <div class="text-danger text-center px-4">
-                <i class="bi bi-x-octagon-fill" style="font-size: 3rem;"></i>
-                <h5 class="mt-3 fw-bold">Gagal Terhubung API</h5>
-                <p class="text-muted">${error.message}</p>
-                <button class="btn btn-outline-danger mt-2" onclick="location.reload()">Muat Ulang</button>
-              </div>`;
-        }
-      }
+        // Auto clock
+        setInterval(() => {
+          document.getElementById("realtime-clock").innerText = new Date().toLocaleDateString("id-ID", {
+            weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit",
+          }).replace(/\./g, ":");
+        }, 1000);
+      };
 
-      // --- RENDER UI ---
-      function renderSuggestions() {
-        const dlist = document.getElementById("listSiswaSuggestion"); dlist.innerHTML = "";
-        dataSiswa.forEach(s => dlist.innerHTML += `<option value="${s.nama}">ID: ${s.id}</option>`);
-      }
-      function renderTabelSiswa() {
-        const tbody = document.getElementById("body-tabel-siswa"); tbody.innerHTML = "";
-        dataSiswa.forEach(s => tbody.innerHTML += `<tr><td>${s.id}</td><td class="fw-bold">${s.nama}</td><td>${s.wali}<br><small>${s.hp}</small></td><td>${s.jenjang}</td></tr>`);
-      }
-      function renderDashboard() {
-         document.getElementById("dash-siswa").innerText = dataSiswa.length;
-         document.getElementById("dash-absen").innerText = dataLog.length;
-         const tbody = document.getElementById("dash-aktivitas"); tbody.innerHTML = "";
-         dataLog.slice(-5).reverse().forEach(l => {
-             let b = l.status === "Hadir" ? "success" : "warning";
-             tbody.innerHTML += `<tr><td><div class="fw-bold">${l.nama}</div><small class="text-muted">${l.tgl}</small></td><td class="text-end"><span class="badge bg-${b}">${l.status}</span></td></tr>`;
-         });
+      // FUNGSI UTAMA API FETCHING
+      async function callGAS(payload) {
+        try {
+          const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload),
+            // Mencegah Preflight CORS Error
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' } 
+          });
+          const result = await response.json();
+          if(result.status === 'error') throw new Error(result.message);
+          return result.data;
+        } catch (error) {
+          Swal.fire('Terjadi Kesalahan', error.message, 'error');
+          return null;
+        }
       }
 
       // --- PORTAL WALI ---
       async function cariDataWali() {
-        const input = document.getElementById("inputCariWali").value.trim();
-        if (!input) return Swal.fire("Oops", "Masukkan Nama!", "warning");
-        const siswa = dataSiswa.find(s => s.nama.toLowerCase() === input.toLowerCase() || s.id.toLowerCase() === input.toLowerCase());
-        if (!siswa) return Swal.fire("Tidak Ditemukan", "Nama tidak terdaftar.", "error");
+        const namaInput = document.getElementById("inputCariWali").value.trim();
+        if (!namaInput) return Swal.fire("Oops", "Masukkan Nama Siswa!", "warning");
 
-        const { value: pin } = await Swal.fire({ title: "PIN", input: "password", showCancelButton: true });
+        const { value: pin } = await Swal.fire({
+          title: "Masukkan PIN", input: "password", inputPlaceholder: "Masukkan PIN", showCancelButton: true,
+        });
+
         if (!pin) return; 
-        if (pin !== siswa.pin) return Swal.fire("Oops", "PIN Salah!", "error");
 
-        document.getElementById("pw-nama").innerText = siswa.nama;
-        document.getElementById("pw-id").innerText = siswa.id;
-        document.getElementById("pw-qr").src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${siswa.id}`;
-        document.getElementById("pw-search-view").classList.add("d-none");
-        document.getElementById("pw-detail-view").classList.remove("d-none");
-        renderDataWali();
+        Swal.showLoading();
+        const data = await callGAS({ action: 'cariWali', nama: namaInput, pin: pin });
+        Swal.close();
+
+        if (data) {
+          STATE.currentWaliLog = data.log;
+          document.getElementById("pw-nama").innerText = data.profil.nama;
+          document.getElementById("pw-id").innerText = data.profil.id;
+          document.getElementById("pw-jenjang").innerText = data.profil.jenjang;
+          document.getElementById("pw-qr").src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${data.profil.id}`;
+
+          Swal.fire("Berhasil", `Selamat datang, ${data.profil.nama}!`, "success");
+          
+          const searchView = document.getElementById("pw-search-view");
+          const detailView = document.getElementById("pw-detail-view");
+          searchView.classList.add("fade-out");
+          
+          setTimeout(() => {
+            searchView.classList.add("d-none");
+            detailView.classList.remove("d-none");
+            detailView.classList.remove("fade-out");
+            renderDataWali();
+          }, 500);
+        }
       }
 
       function renderDataWali() {
-        const nama = document.getElementById("pw-nama").innerText;
         const bln = document.getElementById("pw-filter-bulan").value;
-        const tbody = document.getElementById("pw-tabel-rincian"); tbody.innerHTML = "";
+        const tbody = document.getElementById("pw-tabel-rincian");
+        tbody.innerHTML = "";
+
         let sReg = 0, sOver = 0;
-        dataLog.filter(l => l.nama === nama && l.bulan === bln).forEach(l => {
-            sReg += l.reg; sOver += l.over;
-            let tar = l.status === "Hadir" ? l.reg : l.over;
-            tbody.innerHTML += `<tr><td class="fw-bold">${l.hari}, ${l.tgl}</td><td><span class="badge bg-${l.status === "Hadir" ? "success" : "warning"}">${l.status}</span></td><td>Rp ${tar.toLocaleString("id-ID")}</td></tr>`;
+        
+        STATE.currentWaliLog.filter(l => l.bulan === bln).forEach((l) => {
+          sReg += l.reg;
+          sOver += l.over;
+          let b = l.status === "Hadir" ? "success" : "warning";
+          let tar = l.status === "Hadir" ? l.reg : l.over;
+          tbody.innerHTML += `<tr><td class="fw-bold">${l.hari}, ${l.tglStr} WIB</td><td><span class="badge bg-${b}">${l.status}</span></td><td>Rp ${tar.toLocaleString("id-ID")}</td></tr>`;
         });
+
+        if (tbody.innerHTML === "") tbody.innerHTML = `<tr><td colspan="3" class="text-center text-muted">Belum ada data kehadiran bulan ini.</td></tr>`;
+
         document.getElementById("pw-sum-reguler").innerText = `Rp ${sReg.toLocaleString("id-ID")}`;
         document.getElementById("pw-sum-overtime").innerText = `Rp ${sOver.toLocaleString("id-ID")}`;
         document.getElementById("pw-sum-total").innerText = `Rp ${(sReg + sOver).toLocaleString("id-ID")}`;
       }
-      function kembaliKeSearch() { document.getElementById("pw-detail-view").classList.add("d-none"); document.getElementById("pw-search-view").classList.remove("d-none"); }
 
-      // --- ADMIN LOGIN ---
-      async function showAdminLogin() {
-          const { value: form } = await Swal.fire({
-            title: 'Login', html: '<input id="su" class="swal2-input" placeholder="User"><input id="sp" type="password" class="swal2-input" placeholder="Pass">',
-            preConfirm: () => [document.getElementById('su').value, document.getElementById('sp').value]
-          });
-          if (form) {
-            Swal.fire({title: 'Memeriksa...', didOpen: () => Swal.showLoading()});
-            try {
-                const res = await apiCall("loginAdmin", { username: form[0], password: form[1] });
-                if(res.auth) {
-                    Swal.fire('Berhasil', '', 'success');
-                    document.getElementById("portal-wali").classList.add("d-none");
-                    document.getElementById("portal-admin").classList.remove("d-none");
-                } else Swal.fire('Gagal', res.message, 'error');
-            } catch (e) { Swal.fire('Error API', e.message, 'error'); }
+      function kembaliKeSearch() {
+        document.getElementById("pw-detail-view").classList.add("fade-out");
+        setTimeout(() => {
+          document.getElementById("pw-detail-view").classList.add("d-none");
+          const searchView = document.getElementById("pw-search-view");
+          searchView.classList.remove("d-none");
+          document.getElementById("inputCariWali").value = "";
+          setTimeout(() => searchView.classList.remove("fade-out"), 50);
+        }, 500);
+      }
+
+      // --- PORTAL ADMIN (LOGIN & INIT) ---
+      async function showAdminPortal() {
+        Swal.fire({
+          title: 'Login Admin', html: `<input type="text" id="loginUser" class="swal2-input" placeholder="Username"><input type="password" id="loginPass" class="swal2-input" placeholder="Password">`,
+          confirmButtonText: 'Masuk', focusConfirm: false,
+          preConfirm: () => {
+            const u = Swal.getPopup().querySelector('#loginUser').value;
+            const p = Swal.getPopup().querySelector('#loginPass').value;
+            if (!u || !p) Swal.showValidationMessage(`Masukkan username & password`);
+            return { u, p };
           }
-      }
-      function logoutAdmin() { location.reload(); }
-      function switchMenu(id, el) {
-          document.querySelectorAll('.menu-section').forEach(m => m.classList.add('d-none'));
-          document.getElementById(id).classList.remove('d-none');
-          document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-          if(el) el.classList.add('active'); if(id !== 'menu-absen') stopScanner();
-      }
-
-      // --- SCANNER jsQR ---
-      let videoElement = document.getElementById("video"); let canvasElement = document.getElementById("canvasElement");
-      let canvas = canvasElement.getContext("2d", { willReadFrequently: true }); let scanning = false, streamTrack = null;
-
-      function initScanner() {
-        document.getElementById("btnMulaiKamera").classList.add("d-none"); document.getElementById("btnStopKamera").classList.remove("d-none");
-        document.getElementById("reader-container").style.display = "block";
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(stream => {
-          streamTrack = stream; videoElement.srcObject = stream; videoElement.play(); scanning = true; requestAnimationFrame(tick);
-        }).catch(err => Swal.fire("Error", "Akses kamera ditolak.", "error"));
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Bypass login simulasi (Bisa dienkripsi/divalidasi ke GAS nantinya)
+            if (result.value.u === 'admin' && result.value.p === 'admin123') {
+              document.getElementById("portal-wali").classList.add("d-none");
+              document.getElementById("portal-admin").classList.remove("d-none");
+              loadDataAdmin(false); // Ambil data saat masuk
+            } else {
+              Swal.fire('Gagal', 'Kredensial salah', 'error');
+            }
+          }
+        });
       }
 
-      function tick() {
-        if (!scanning) return;
-        if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
-          canvasElement.height = videoElement.videoHeight; canvasElement.width = videoElement.videoWidth;
-          canvas.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
-          let imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
-          let code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
-          if (code && code.data) { stopScanner(); simpanAbsenKeDatabase(code.data, 'Hadir'); return; }
+      function logoutAdmin() {
+        document.getElementById("portal-admin").classList.add("d-none");
+        document.getElementById("portal-wali").classList.remove("d-none");
+        kembaliKeSearch();
+      }
+
+      // LOAD DATA DARI GAS KE MEMORI LOKAL
+      async function loadDataAdmin(isRefresh = false) {
+        if(isRefresh) Swal.showLoading();
+        else Swal.fire({ title: 'Memuat Database...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+        
+        const data = await callGAS({ action: 'getAdminData' });
+        
+        if (data) {
+          STATE = data;
+          
+          // Populate suggestions
+          const dlist = document.getElementById("listSiswaSuggestion");
+          dlist.innerHTML = "";
+          STATE.siswa.forEach((s) => { dlist.innerHTML += `<option value="${s.nama}">ID: ${s.id}</option>`; });
+
+          updateDashboardView();
+          renderTabelSiswa();
+          renderTabelTarif();
+          filterLog();
+          filterLaporan();
+          
+          if(isRefresh) Swal.fire({toast: true, position: 'top-end', icon: 'success', title: 'Data diperbarui!', timer: 1500, showConfirmButton: false});
+          else Swal.close();
         }
-        requestAnimationFrame(tick);
-      }
-      function stopScanner() { scanning = false; if (streamTrack) streamTrack.getTracks().forEach(t => t.stop()); document.getElementById("reader-container").style.display = "none"; document.getElementById("btnMulaiKamera").classList.remove("d-none"); document.getElementById("btnStopKamera").classList.add("d-none"); }
-
-      function simpanManual() {
-         const nama = document.getElementById("manualSiswa").value; const tipe = document.getElementById("manualTipe").value;
-         if(!nama) return Swal.fire("Oops", "Isi Nama Siswa!", "warning");
-         simpanAbsenKeDatabase(nama, tipe);
       }
 
-      async function simpanAbsenKeDatabase(idAtauNama, tipe) {
-          Swal.fire({title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
-          try {
-              const res = await apiCall("catatKehadiran", { idAtauNama: idAtauNama, tipe: tipe });
-              Swal.fire('Sukses', res.message, 'success').then(() => {
-                  document.getElementById("loadingOverlay").style.display = "flex";
-                  fetchBackendData(); // Ambil data terbaru
-              });
-          } catch(e) { Swal.fire('Gagal', e.message, 'error'); }
+      function updateDashboardView() {
+        const bln = document.getElementById("dashBulan").value;
+        const totalSiswa = STATE.siswa.length;
+        
+        let hadirHariIni = 0;
+        let sesiOvertime = 0;
+        let income = 0;
+
+        const todayStr = new Date().toLocaleDateString("en-GB"); // Format DD/MM/YYYY
+
+        STATE.log.forEach(l => {
+          if (l.bulan === bln) {
+            if (l.status === 'Overtime') sesiOvertime++;
+            income += (l.reg + l.over);
+          }
+          // Hitung hadir hari ini (Cek string Tgl)
+          if (l.tglStr.includes(new Date().getDate() + " " + new Date().toLocaleString('id', {month: 'short'}))) {
+             hadirHariIni++;
+          }
+        });
+
+        document.getElementById('dashSiswa').innerText = totalSiswa;
+        document.getElementById('dashHadir').innerText = hadirHariIni;
+        document.getElementById('dashOvertime').innerText = sesiOvertime;
+        document.getElementById('dashIncome').innerText = `Rp ${income.toLocaleString('id-ID')}`;
+      }
+
+      // --- RENDER TABEL ---
+      function renderTabelSiswa() {
+        const tbody = document.getElementById("body-tabel-siswa");
+        tbody.innerHTML = "";
+        STATE.siswa.forEach(s => {
+          tbody.innerHTML += `<tr>
+            <td>${s.id}</td><td class="fw-bold">${s.nama}</td><td>${s.wali} <br><small class="text-muted"><i class="bi bi-telephone"></i> ${s.hp}</small></td><td>${s.jenjang}</td>
+            <td><button class="btn btn-sm btn-outline-primary" onclick="showIDCard('${s.id}')"><i class="bi bi-person-vcard"></i> Cetak QR</button></td>
+          </tr>`;
+        });
+      }
+
+      function renderTabelTarif() {
+        const tbody = document.getElementById("body-tabel-tarif");
+        tbody.innerHTML = "";
+        STATE.tarif.forEach(t => {
+          tbody.innerHTML += `<tr>
+            <td class="fw-bold">${t.nama}</td><td><small>${t.hari}</small></td>
+            <td>Rp ${t.reg.toLocaleString("id-ID")}</td><td>Rp ${t.over.toLocaleString("id-ID")}</td>
+          </tr>`;
+        });
+      }
+
+      function filterLog() {
+        const bln = document.getElementById("searchLogBulan").value;
+        const tbody = document.getElementById("body-tabel-log");
+        tbody.innerHTML = "";
+
+        STATE.log.filter(l => l.bulan === bln).forEach(l => {
+          let b = l.status === "Hadir" ? "success" : "warning";
+          let nominal = l.status === "Hadir" ? l.reg : l.over;
+          tbody.innerHTML += `<tr><td><span class="fw-bold">${l.hari}</span>, ${l.tglStr}</td><td class="fw-bold">${l.nama}</td><td><span class="badge bg-${b}">${l.status}</span></td><td>Rp ${nominal.toLocaleString("id-ID")}</td></tr>`;
+        });
+      }
+
+      function filterLaporan() {
+        const bln = document.getElementById("searchLapBulan").value;
+        const tbody = document.getElementById("body-tabel-laporan");
+        tbody.innerHTML = "";
+
+        let grouped = {};
+        STATE.log.filter(l => l.bulan === bln).forEach(l => {
+          if (!grouped[l.idSiswa]) grouped[l.idSiswa] = { nama: l.nama, reg: 0, over: 0 };
+          grouped[l.idSiswa].reg += l.reg;
+          grouped[l.idSiswa].over += l.over;
+        });
+
+        Object.keys(grouped).forEach(k => {
+          let g = grouped[k];
+          let tot = g.reg + g.over;
+          tbody.innerHTML += `<tr>
+            <td><div class="fw-bold">${g.nama}</div><small class="text-muted">${k}</small></td>
+            <td>Rp ${g.reg.toLocaleString("id-ID")}</td><td>Rp ${g.over.toLocaleString("id-ID")}</td>
+            <td class="text-nowrap fw-bold text-danger">Rp ${tot.toLocaleString("id-ID")}</td>
+            <td><button class="btn btn-sm btn-success" onclick="kirimWAPesan('${g.nama}', ${tot})"><i class="bi bi-whatsapp"></i> Kirim Tagihan</button></td>
+          </tr>`;
+        });
+      }
+
+      // --- ABSENSI & SCANNER ---
+      let html5QrcodeScanner = null;
+      function initScanner() {
+        document.getElementById("btnMulaiKamera").style.display = "none";
+        if (!html5QrcodeScanner) {
+          html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 250 } }, false);
+          html5QrcodeScanner.render(async (decodedText) => {
+            stopScanner();
+            Swal.showLoading();
+            
+            // Proses Kehadiran QR = Default Tipe Hadir
+            const res = await callGAS({ action: 'catatAbsen', idSiswa: decodedText, tipe: 'Hadir' });
+            if (res) {
+               Swal.fire("Berhasil Absen!", `${res.nama} hadir. Tarif Rp ${res.tarifDikenakan.toLocaleString('id-ID')} dicatat.`, "success");
+               loadDataAdmin(true); // Auto refresh data di belakang layar
+            }
+          }, () => {});
+        }
+      }
+      function stopScanner() {
+        if (html5QrcodeScanner) {
+          html5QrcodeScanner.clear().then(() => { html5QrcodeScanner = null; document.getElementById("btnMulaiKamera").style.display = "inline-block"; });
+        }
+      }
+
+      function toggleManualOvertime(val) {
+        if(val === 'Overtime') document.getElementById('wrapManualOvertime').classList.remove('d-none');
+        else document.getElementById('wrapManualOvertime').classList.add('d-none');
+      }
+
+      async function simpanAbsenManual() {
+        const idSiswa = document.getElementById("manualSiswa").value;
+        const tipe = document.getElementById("manualTipe").value;
+        const nomOvertime = document.getElementById("manualNominalOvertime").value;
+
+        if (!idSiswa) return Swal.fire("Oops", "Masukkan Nama / ID Siswa!", "warning");
+        
+        Swal.showLoading();
+        const res = await callGAS({ action: 'catatAbsen', idSiswa: idSiswa, tipe: tipe, nominalOvertimeManual: nomOvertime });
+        
+        if (res) {
+          Swal.fire("Berhasil", `Kehadiran manual (${tipe}) untuk ${res.nama} dicatat. Tarif: Rp ${res.tarifDikenakan.toLocaleString('id-ID')}`, "success");
+          document.getElementById("manualSiswa").value = "";
+          document.getElementById("manualNominalOvertime").value = "";
+          loadDataAdmin(true);
+        }
+      }
+
+      // --- CETAK ID CARD & WA API ---
+      function showIDCard(id) {
+        const siswa = STATE.siswa.find(s => s.id === id);
+        document.getElementById("idcard-id").innerText = siswa.id;
+        document.getElementById("idcard-nama").innerText = siswa.nama;
+        document.getElementById("idcard-jenjang").innerText = siswa.jenjang;
+        document.getElementById("idcard-qr-img").src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${siswa.id}`;
+        new bootstrap.Modal(document.getElementById("modalIDCard")).show();
+      }
+
+      function cetakIDCard() {
+        const cardHTML = document.getElementById("printable-id-card").outerHTML;
+        const printWin = window.open("", "_blank");
+        printWin.document.write(`<html><head><title>Cetak ID Card</title><style>body{display:flex;justify-content:center;padding:20px;font-family:sans-serif;}.id-card-container{width:85.6mm;height:53.98mm;background:#fff;border:2px solid #0084ff;border-radius:10px;position:relative;padding:15px;display:flex;align-items:center;gap:15px;overflow:hidden;}.id-card-qr{width:90px;height:90px;}.id-card-details{flex:1;z-index:2;}.id-card-bg-icon{position:absolute;right:-10px;bottom:-10px;font-size:80px;opacity:0.1;color:#0084ff;z-index:1;}h5{margin:0;color:#0084ff;}h6{margin:5px 0;font-size:14px;}</style></head><body onload="window.print(); window.close();">${cardHTML}</body></html>`);
+        printWin.document.close();
+      }
+
+      async function kirimWAPesan(namaSiswa, totalTagihan) {
+        const siswa = STATE.siswa.find(s => s.nama === namaSiswa);
+        if(!siswa || !siswa.hp) return Swal.fire("Error", "Nomor HP Wali tidak ditemukan", "error");
+
+        const pesan = `Halo Bapak/Ibu Wali dari ${namaSiswa}. \nBerikut adalah notifikasi tagihan bulanan les sebesar *Rp ${totalTagihan.toLocaleString('id-ID')}*. \nRincian dapat dicek melalui portal wali. Terima kasih.`;
+        
+        const confirm = await Swal.fire({
+          title: 'Kirim Tagihan via WA?', text: `Kirim ke HP: ${siswa.hp}`, icon: 'question', showCancelButton: true
+        });
+
+        if(confirm.isConfirmed) {
+          Swal.showLoading();
+          const res = await callGAS({ action: 'sendWA', target: siswa.hp, pesan: pesan });
+          if(res) Swal.fire("Terkirim", "Pesan WA berhasil masuk antrean server Fonnte", "success");
+        }
+      }
+
+      // --- UI TOGGLES ---
+      function toggleSidebar() { document.getElementById("sidebar").classList.toggle("show"); document.getElementById("mobileOverlay").classList.toggle("show"); }
+      function toggleTheme() {
+        const html = document.documentElement;
+        const newTheme = html.getAttribute("data-bs-theme") === "light" ? "dark" : "light";
+        html.setAttribute("data-bs-theme", newTheme);
+        document.querySelector("#themeToggleBtn i").className = newTheme === "light" ? "bi bi-moon-fill" : "bi bi-sun-fill";
+      }
+      function switchMenu(menuId, element) {
+        document.querySelectorAll(".menu-section").forEach(el => el.classList.add("d-none"));
+        document.getElementById(menuId).classList.remove("d-none");
+        document.querySelectorAll("#sidebar .nav-link").forEach(el => el.classList.remove("active"));
+        if (element && element.classList.contains("nav-link")) element.classList.add("active");
+        const titles = { "menu-dashboard": "Dashboard", "menu-absen": "Absensi Scanner", "menu-siswa": "Data Siswa", "menu-tarif": "Pengaturan Tarif", "menu-log": "Log Kehadiran", "menu-laporan": "Laporan & Invoice", "menu-role": "Manajemen Role" };
+        document.getElementById("pageTitle").innerText = titles[menuId];
+        if (window.innerWidth <= 768 && document.getElementById("sidebar").classList.contains("show")) toggleSidebar();
+        if (menuId !== "menu-absen") { stopScanner(); document.getElementById("btnMulaiKamera").style.display = "inline-block"; }
+      }
+      function setActiveBottomNav(element) {
+        document.querySelectorAll(".nav-item-bottom").forEach(el => el.classList.remove("active"));
+        if (element) element.classList.add("active");
       }
     </script>
   </body>
