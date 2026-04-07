@@ -3,25 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Portal Absensi Les - Modern UI ✨</title>
+    <title>Portal Absensi Les - Smart System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <!-- SOLUSI JITU: Menggunakan jsQR yang 100% bebas dari eval() dan aman dari CSP Google -->
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 
     <style>
       :root {
         --primary-color: #0084ff; --primary-hover: #0070d9; --bg-color: #f8fafd;
         --card-bg: #ffffff; --text-main: #1e293b; --text-muted: #64748b;
-        --border-color: #e2e8f0; --sidebar-width: 260px; --success-color: #10b981;
-        --warning-color: #f59e0b; --danger-color: #ef4444;
-      }
-      [data-bs-theme="dark"] {
-        --bg-color: #0f172a; --card-bg: #1e293b; --text-main: #f8fafc;
-        --text-muted: #94a3b8; --border-color: #334155;
+        --border-color: #e2e8f0; --sidebar-width: 260px;
       }
       body { font-family: "Nunito", sans-serif; background-color: var(--bg-color); color: var(--text-main); overflow-x: hidden; }
       #sidebar { width: var(--sidebar-width); position: fixed; top: 0; left: 0; height: 100vh; background-color: var(--card-bg); border-right: 1px solid var(--border-color); z-index: 1040; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; }
@@ -40,42 +33,20 @@
       .stat-card { padding: 1.5rem; border-radius: 16px; color: white; position: relative; overflow: hidden; }
       .stat-card.blue { background: linear-gradient(135deg, #0084ff, #3b82f6); }
       .stat-card.green { background: linear-gradient(135deg, #10b981, #059669); }
-      .stat-card.orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
-      .stat-card.purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
-      .stat-icon { position: absolute; right: -10px; bottom: -20px; font-size: 6rem; opacity: 0.15; }
-      .form-control, .form-select { background-color: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 10px; padding: 0.6rem 1rem; }
+      .form-control, .form-select { background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.6rem 1rem; }
       .input-icon-wrapper { position: relative; width: 100%; }
       .input-icon-wrapper i { position: absolute; top: 50%; transform: translateY(-50%); left: 1rem; color: var(--text-muted); z-index: 5; }
       .input-icon-wrapper .form-control { padding-left: 2.75rem; }
       .table th { background-color: rgba(0, 0, 0, 0.02); font-weight: 600; padding: 1rem; }
       .table td { padding: 1rem; vertical-align: middle; }
-      .fade-transition { transition: opacity 0.5s ease, transform 0.5s ease; opacity: 1; transform: translateY(0); }
-      .fade-out { opacity: 0; transform: translateY(-20px); pointer-events: none; position: absolute; width: 100%; visibility: hidden; }
-      #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.85); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
       
-      /* Styling untuk Scanner Baru */
-      #reader-container {
-        display: none;
-        position: relative;
-        width: 100%;
-        max-width: 400px;
-        margin: auto;
-        border-radius: 12px;
-        overflow: hidden;
-        border: 3px solid var(--primary-color);
-        background: #000;
-      }
+      #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+      
+      #reader-container { display: none; position: relative; width: 100%; max-width: 400px; margin: auto; border-radius: 12px; overflow: hidden; border: 3px solid var(--primary-color); background: #000; }
       #video { width: 100%; height: auto; display: block; }
-      .scan-line {
-        position: absolute; width: 100%; height: 3px; background: #00ff00;
-        top: 50%; left: 0; box-shadow: 0 0 15px #00ff00;
-        animation: scan 2s infinite linear;
-      }
-      @keyframes scan {
-        0% { top: 0; } 50% { top: 100%; } 100% { top: 0; }
-      }
+      .scan-line { position: absolute; width: 100%; height: 3px; background: #00ff00; top: 50%; left: 0; box-shadow: 0 0 15px #00ff00; animation: scan 2s infinite linear; }
+      @keyframes scan { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
       
-      [data-bs-theme="dark"] #loadingOverlay { background: rgba(15, 23, 42, 0.85); }
       @media (max-width: 768px) {
         #sidebar { transform: translateX(-100%); z-index: 1060; }
         #sidebar.show { transform: translateX(0); }
@@ -87,8 +58,8 @@
     <!-- LOADING SCREEN -->
     <div id="loadingOverlay">
       <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
-      <h5 class="fw-bold">Menghubungkan ke Database...</h5>
-      <p class="text-muted small">Mohon tunggu sebentar</p>
+      <h5 class="fw-bold">Menghubungkan ke API...</h5>
+      <p class="text-muted small" id="loadingText">Mengambil data dari Google Server</p>
     </div>
 
     <datalist id="listSiswaSuggestion"></datalist>
@@ -98,59 +69,50 @@
       <div class="p-3 d-flex justify-content-between align-items-center bg-transparent position-absolute w-100 z-3">
         <div class="d-flex align-items-center gap-2">
           <div class="brand-icon" style="width: 35px; height: 35px"><i class="bi bi-rocket-takeoff-fill"></i></div>
-          <h5 class="m-0 fw-bold">Smart<span class="text-primary">Absen</span><small class="text-muted fw-normal">| Portal Wali</small></h5>
+          <h5 class="m-0 fw-bold">Smart<span class="text-primary">Absen</span></h5>
         </div>
         <button class="btn btn-outline-primary rounded-pill px-4 fw-bold" onclick="showAdminLogin()"><i class="bi bi-person-lock"></i> Login Admin</button>
       </div>
 
-      <div id="pw-search-view" class="fade-transition min-vh-100 d-flex align-items-center justify-content-center flex-column px-3 pt-5">
+      <div id="pw-search-view" class="min-vh-100 d-flex align-items-center justify-content-center flex-column px-3 pt-5">
         <div class="text-center mb-5">
-          <img src="https://cdn-icons-png.flaticon.com/512/3238/3238015.png" alt="Portal Wali" width="120" class="mb-3 opacity-75" />
-          <h2 class="fw-bold">Pantau Kehadiran Anak Anda</h2>
-          <p class="text-muted">Masukkan Nama Siswa untuk melihat rincian kehadiran dan tagihan.</p>
+          <img src="https://cdn-icons-png.flaticon.com/512/3238/3238015.png" width="120" class="mb-3 opacity-75" />
+          <h2 class="fw-bold">Pantau Kehadiran</h2>
         </div>
         <div class="custom-card p-4 shadow-sm" style="max-width: 500px; width: 100%">
           <div class="input-icon-wrapper mb-3">
             <i class="bi bi-search"></i>
-            <label for="inputCariWali" class="visually-hidden">Cari Nama Siswa</label>
             <input type="text" id="inputCariWali" list="listSiswaSuggestion" class="form-control" placeholder="Ketik nama siswa..." />
           </div>
-          <button class="btn btn-primary w-100 py-2 fw-bold fs-5" onclick="cariDataWali()">Lihat Data Kehadiran</button>
+          <button class="btn btn-primary w-100 py-2 fw-bold fs-5" onclick="cariDataWali()">Cari Data</button>
         </div>
       </div>
 
-      <div id="pw-detail-view" class="fade-transition d-none min-vh-100 w-100 pt-5 px-3 pb-5" style="max-width: 1000px; margin: 0 auto; padding-top: 80px !important">
+      <div id="pw-detail-view" class="d-none min-vh-100 w-100 pt-5 px-3 pb-5" style="max-width: 1000px; margin: 0 auto; padding-top: 80px !important">
         <button class="btn btn-light mb-4" onclick="kembaliKeSearch()"><i class="bi bi-arrow-left"></i> Kembali</button>
         <div class="row g-4 mb-4">
           <div class="col-md-7">
             <div class="custom-card p-4 h-100 d-flex align-items-center gap-4">
-              <img src="" alt="QR" class="rounded border p-1" width="80" id="pw-qr" />
-              <div>
-                <h3 class="fw-bold m-0" id="pw-nama">-</h3>
-                <p class="text-muted m-0"><i class="bi bi-person-badge"></i> ID: <span id="pw-id">-</span> | <span id="pw-jenjang">-</span></p>
-              </div>
+              <img src="" class="rounded border p-1" width="80" id="pw-qr" />
+              <div><h3 class="fw-bold m-0" id="pw-nama">-</h3><p class="text-muted m-0">ID: <span id="pw-id">-</span></p></div>
             </div>
           </div>
           <div class="col-md-5">
             <div class="custom-card p-4 h-100 d-flex flex-column justify-content-center">
-              <label for="pw-filter-bulan" class="fw-bold mb-2">Pilih Bulan Kehadiran</label>
-              <div class="input-icon-wrapper">
-                <i class="bi bi-calendar-month"></i>
-                <input type="month" class="form-control form-control-lg" id="pw-filter-bulan" onchange="renderDataWali()" />
-              </div>
+              <label class="fw-bold mb-2">Bulan</label>
+              <input type="month" class="form-control form-control-lg" id="pw-filter-bulan" onchange="renderDataWali()" />
             </div>
           </div>
         </div>
         <div class="row g-3 mb-4">
-          <div class="col-md-4"><div class="custom-card p-3 border-start border-4 border-primary"><p class="text-muted mb-1 small fw-bold">Total Reguler</p><h3 class="m-0 fw-bold" id="pw-sum-reguler">Rp 0</h3></div></div>
-          <div class="col-md-4"><div class="custom-card p-3 border-start border-4 border-warning"><p class="text-muted mb-1 small fw-bold">Total Overtime</p><h3 class="m-0 fw-bold" id="pw-sum-overtime">Rp 0</h3></div></div>
-          <div class="col-md-4"><div class="custom-card p-3 border-start border-4 border-danger"><p class="text-danger mb-1 small fw-bold">Est. Tagihan</p><h3 class="m-0 fw-bold text-danger" id="pw-sum-total">Rp 0</h3></div></div>
+          <div class="col-md-4"><div class="custom-card p-3 border-start border-4 border-primary"><p class="text-muted mb-1 small">Reguler</p><h3 class="m-0 fw-bold" id="pw-sum-reguler">Rp 0</h3></div></div>
+          <div class="col-md-4"><div class="custom-card p-3 border-start border-4 border-warning"><p class="text-muted mb-1 small">Overtime</p><h3 class="m-0 fw-bold" id="pw-sum-overtime">Rp 0</h3></div></div>
+          <div class="col-md-4"><div class="custom-card p-3 border-start border-4 border-danger"><p class="text-danger mb-1 small">Total</p><h3 class="m-0 fw-bold text-danger" id="pw-sum-total">Rp 0</h3></div></div>
         </div>
         <div class="custom-card">
-          <div class="card-header-custom">Rincian Kehadiran Anak</div>
           <div class="table-responsive">
             <table class="table table-hover">
-              <thead><tr><th>Hari, Tanggal & Waktu</th><th>Tipe Kehadiran</th><th>Tarif</th></tr></thead>
+              <thead><tr><th>Waktu</th><th>Tipe</th><th>Tarif</th></tr></thead>
               <tbody id="pw-tabel-rincian"></tbody>
             </table>
           </div>
@@ -163,64 +125,48 @@
       <aside id="sidebar">
         <div class="sidebar-header">
           <div class="brand-icon"><i class="bi bi-rocket-takeoff-fill"></i></div>
-          <h5 class="m-0 fw-bold">Smart<span class="text-primary">Absen</span></h5>
+          <h5 class="m-0 fw-bold">Admin</h5>
         </div>
         <div class="nav-menu">
           <div class="nav-item"><a href="#" class="nav-link active" onclick="switchMenu('menu-dashboard', this)"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a></div>
-          <div class="nav-item"><a href="#" class="nav-link" onclick="switchMenu('menu-absen', this)"><i class="bi bi-qr-code-scan"></i> Absensi Scanner</a></div>
-          <div class="nav-item"><a href="#" class="nav-link" onclick="switchMenu('menu-siswa', this)"><i class="bi bi-people-fill"></i> Data Siswa</a></div>
+          <div class="nav-item"><a href="#" class="nav-link" onclick="switchMenu('menu-absen', this)"><i class="bi bi-qr-code-scan"></i> Scanner</a></div>
+          <div class="nav-item"><a href="#" class="nav-link" onclick="switchMenu('menu-siswa', this)"><i class="bi bi-people-fill"></i> Siswa</a></div>
           <div class="nav-item"><a href="#" class="nav-link text-danger" onclick="logoutAdmin()"><i class="bi bi-box-arrow-left"></i> Logout</a></div>
         </div>
       </aside>
 
       <main id="main-content">
-        <header class="top-header">
-          <h4 class="m-0 fw-bold" id="pageTitle">Dashboard</h4>
-        </header>
-
         <div class="content-area">
-          <!-- DASHBOARD -->
           <div id="menu-dashboard" class="menu-section">
             <div class="row g-4 mb-4">
-              <div class="col-md-3 col-6"><div class="stat-card blue"><h6 class="fw-bold mb-1">Total Siswa</h6><h3 class="m-0 fw-bold" id="dash-siswa">0</h3></div></div>
-              <div class="col-md-3 col-6"><div class="stat-card green"><h6 class="fw-bold mb-1">Total Absen</h6><h3 class="m-0 fw-bold" id="dash-absen">0</h3></div></div>
+              <div class="col-6"><div class="stat-card blue"><h6 class="mb-1">Total Siswa</h6><h3 class="m-0" id="dash-siswa">0</h3></div></div>
+              <div class="col-6"><div class="stat-card green"><h6 class="mb-1">Total Absen</h6><h3 class="m-0" id="dash-absen">0</h3></div></div>
             </div>
             <div class="custom-card">
               <div class="card-header-custom">Aktivitas Terakhir</div>
-              <div class="table-responsive">
-                <table class="table"><tbody id="dash-aktivitas"></tbody></table>
-              </div>
+              <table class="table"><tbody id="dash-aktivitas"></tbody></table>
             </div>
           </div>
 
-          <!-- ABSEN -->
           <div id="menu-absen" class="menu-section d-none">
              <div class="custom-card p-4 text-center">
-                 <button class="btn btn-outline-primary mb-3 fw-bold" onclick="initScanner()" id="btnMulaiKamera"><i class="bi bi-camera-video"></i> Mulai Kamera QR</button>
-                 <button class="btn btn-outline-danger mb-3 fw-bold d-none" onclick="stopScanner()" id="btnStopKamera"><i class="bi bi-x-circle"></i> Tutup Kamera</button>
+                 <button class="btn btn-primary mb-3 w-100" onclick="initScanner()" id="btnMulaiKamera">Mulai Kamera QR</button>
+                 <button class="btn btn-danger mb-3 w-100 d-none" onclick="stopScanner()" id="btnStopKamera">Tutup Kamera</button>
                  
-                 <!-- KANVAS SCANNER MURNI (BEBAS EVAL CSP) -->
                  <div id="reader-container">
-                    <video id="video" playsinline></video>
-                    <div class="scan-line"></div>
+                    <video id="video" playsinline></video><div class="scan-line"></div>
                  </div>
                  <canvas id="canvasElement" hidden></canvas>
-                 <!-- AKHIR KANVAS -->
 
                  <hr>
-                 <h5 class="fw-bold mt-3">Atau Input Manual</h5>
-                 <label for="manualSiswa" class="visually-hidden">Ketik Nama Siswa</label>
-                 <input type="text" id="manualSiswa" list="listSiswaSuggestion" class="form-control mb-2" placeholder="Ketik Nama Siswa">
-                 <label for="manualTipe" class="visually-hidden">Pilih Tipe Kehadiran</label>
-                 <select id="manualTipe" class="form-control mb-3"><option value="Hadir">Hadir Reguler</option><option value="Overtime">Overtime</option></select>
-                 <button class="btn btn-primary w-100" onclick="simpanManual()">Catat Manual</button>
+                 <input type="text" id="manualSiswa" list="listSiswaSuggestion" class="form-control mb-2" placeholder="Nama Siswa">
+                 <select id="manualTipe" class="form-control mb-3"><option value="Hadir">Hadir</option><option value="Overtime">Overtime</option></select>
+                 <button class="btn btn-dark w-100" onclick="simpanManual()">Catat Manual</button>
              </div>
           </div>
 
-          <!-- SISWA -->
           <div id="menu-siswa" class="menu-section d-none">
              <div class="custom-card">
-                 <div class="card-header-custom">Daftar Siswa (Sesuai Spreadsheet)</div>
                  <div class="table-responsive">
                     <table class="table">
                         <thead><tr><th>ID</th><th>Nama</th><th>Wali/HP</th><th>Jenjang</th></tr></thead>
@@ -235,111 +181,88 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      let dataSiswa = [];
-      let dataTarif = [];
-      let dataLog = [];
+      // =======================================================================
+      // 1. GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE APPS SCRIPT-MU !!!
+      // =======================================================================
+      const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzOtDFXKL1CZkyTsGOZd5fSVLvJjiMGRB9jvAZMl5TRDtJI7R5bMBXhvaQqEnJE-Kpy/exec";
+      
+      let dataSiswa = [], dataTarif = [], dataLog = [];
 
       window.onload = function () {
-        const curMonth = new Date().toISOString().slice(0, 7);
-        document.getElementById("pw-filter-bulan").value = curMonth;
-
-        const loadingTimeout = setTimeout(() => {
-          document.getElementById("loadingOverlay").innerHTML = `
-            <div class="text-danger text-center px-4">
-              <i class="bi bi-shield-lock-fill" style="font-size: 4rem;"></i>
-              <h4 class="mt-3 fw-bold">Akses Diblokir Browser</h4>
-              <p class="text-muted mt-2">Koneksi melebihi batas waktu (Timeout).</p>
-            </div>`;
-        }, 12000);
-
-        try {
-          if (typeof google === 'undefined') {
-            throw new Error("Aplikasi tidak berjalan di environment Google Apps Script yang benar.");
-          }
-
-          // PANGGIL BACKEND
-          google.script.run
-            .withSuccessHandler((data) => {
-                clearTimeout(loadingTimeout);
-                onDataLoaded(data);
-            })
-            .withFailureHandler(err => {
-                clearTimeout(loadingTimeout);
-                console.error("Backend Error Detail:", err);
-                let errorMsg = err.message || err;
-                document.getElementById("loadingOverlay").innerHTML = `
-                  <div class="text-danger text-center px-4">
-                    <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
-                    <h4 class="mt-3 fw-bold">Gagal Terhubung ke Database</h4>
-                    <p class="text-muted mt-2">${errorMsg}</p>
-                    <button class="btn btn-outline-danger mt-2" onclick="location.reload()">Muat Ulang</button>
-                  </div>`;
-            })
-            .getAppData(); 
-        } catch (error) {
-            clearTimeout(loadingTimeout);
-            document.getElementById("loadingOverlay").innerHTML = `
-              <div class="text-danger text-center px-4">
-                <i class="bi bi-x-octagon-fill" style="font-size: 4rem;"></i>
-                <h4 class="mt-3 fw-bold">Aplikasi Gagal Dimuat</h4>
-                <p class="text-muted">${error.message}</p>
-              </div>`;
-        }
+        document.getElementById("pw-filter-bulan").value = new Date().toISOString().slice(0, 7);
+        fetchBackendData();
       };
 
-      function onDataLoaded(dataDariSheet) {
-        if (!dataDariSheet) return;
-        dataSiswa = dataDariSheet.siswa || [];
-        dataTarif = dataDariSheet.tarif || [];
-        dataLog = dataDariSheet.log || [];
-        document.getElementById("loadingOverlay").style.display = "none";
-        renderSuggestions();
-        renderTabelSiswa();
-        renderDashboard();
+      // FUNGSI KOMUNIKASI FETCH API (Pengganti google.script.run)
+      async function apiCall(action, payload = {}) {
+        try {
+            // Menggunakan method POST dan mengubah object JSON menjadi string
+            // Kita tidak menggunakan Content-Type application/json agar tidak terblokir CORS preflight
+            const response = await fetch(GAS_API_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: action, ...payload })
+            });
+            const result = await response.json();
+            if (result.status === "error") throw new Error(result.message);
+            return result.data;
+        } catch (error) {
+            console.error("API Error:", error);
+            throw error;
+        }
       }
 
+      async function fetchBackendData() {
+        try {
+            const data = await apiCall("getAppData");
+            dataSiswa = data.siswa || [];
+            dataTarif = data.tarif || [];
+            dataLog = data.log || [];
+            
+            document.getElementById("loadingOverlay").style.display = "none";
+            renderSuggestions(); renderTabelSiswa(); renderDashboard();
+        } catch (error) {
+            document.getElementById("loadingOverlay").innerHTML = `
+              <div class="text-danger text-center px-4">
+                <i class="bi bi-x-octagon-fill" style="font-size: 3rem;"></i>
+                <h5 class="mt-3 fw-bold">Gagal Terhubung API</h5>
+                <p class="text-muted">${error.message}</p>
+                <button class="btn btn-outline-danger mt-2" onclick="location.reload()">Muat Ulang</button>
+              </div>`;
+        }
+      }
+
+      // --- RENDER UI ---
       function renderSuggestions() {
-        const dlist = document.getElementById("listSiswaSuggestion");
-        dlist.innerHTML = "";
-        dataSiswa.forEach(s => { dlist.innerHTML += `<option value="${s.nama}">ID: ${s.id}</option>`; });
+        const dlist = document.getElementById("listSiswaSuggestion"); dlist.innerHTML = "";
+        dataSiswa.forEach(s => dlist.innerHTML += `<option value="${s.nama}">ID: ${s.id}</option>`);
       }
-
       function renderTabelSiswa() {
-        const tbody = document.getElementById("body-tabel-siswa");
-        tbody.innerHTML = "";
-        dataSiswa.forEach(s => {
-          tbody.innerHTML += `<tr><td>${s.id}</td><td class="fw-bold">${s.nama}</td><td>${s.wali}<br><small class="text-muted">${s.hp}</small></td><td>${s.jenjang}</td></tr>`;
-        });
+        const tbody = document.getElementById("body-tabel-siswa"); tbody.innerHTML = "";
+        dataSiswa.forEach(s => tbody.innerHTML += `<tr><td>${s.id}</td><td class="fw-bold">${s.nama}</td><td>${s.wali}<br><small>${s.hp}</small></td><td>${s.jenjang}</td></tr>`);
       }
-
       function renderDashboard() {
          document.getElementById("dash-siswa").innerText = dataSiswa.length;
          document.getElementById("dash-absen").innerText = dataLog.length;
-         const tbody = document.getElementById("dash-aktivitas");
-         tbody.innerHTML = "";
+         const tbody = document.getElementById("dash-aktivitas"); tbody.innerHTML = "";
          dataLog.slice(-5).reverse().forEach(l => {
              let b = l.status === "Hadir" ? "success" : "warning";
              tbody.innerHTML += `<tr><td><div class="fw-bold">${l.nama}</div><small class="text-muted">${l.tgl}</small></td><td class="text-end"><span class="badge bg-${b}">${l.status}</span></td></tr>`;
          });
       }
 
-      // --- LOGIKA PORTAL WALI ---
+      // --- PORTAL WALI ---
       async function cariDataWali() {
         const input = document.getElementById("inputCariWali").value.trim();
-        if (!input) return Swal.fire("Oops", "Masukkan Nama Siswa!", "warning");
+        if (!input) return Swal.fire("Oops", "Masukkan Nama!", "warning");
         const siswa = dataSiswa.find(s => s.nama.toLowerCase() === input.toLowerCase() || s.id.toLowerCase() === input.toLowerCase());
-        if (!siswa) return Swal.fire("Tidak Ditemukan", "Nama siswa tidak terdaftar.", "error");
+        if (!siswa) return Swal.fire("Tidak Ditemukan", "Nama tidak terdaftar.", "error");
 
-        const { value: pin } = await Swal.fire({
-          title: "Masukkan PIN", input: "password", inputAttributes: { maxlength: 4 }, showCancelButton: true
-        });
-
+        const { value: pin } = await Swal.fire({ title: "PIN", input: "password", showCancelButton: true });
         if (!pin) return; 
         if (pin !== siswa.pin) return Swal.fire("Oops", "PIN Salah!", "error");
 
         document.getElementById("pw-nama").innerText = siswa.nama;
         document.getElementById("pw-id").innerText = siswa.id;
-        document.getElementById("pw-jenjang").innerText = siswa.jenjang;
         document.getElementById("pw-qr").src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${siswa.id}`;
         document.getElementById("pw-search-view").classList.add("d-none");
         document.getElementById("pw-detail-view").classList.remove("d-none");
@@ -349,144 +272,85 @@
       function renderDataWali() {
         const nama = document.getElementById("pw-nama").innerText;
         const bln = document.getElementById("pw-filter-bulan").value;
-        const tbody = document.getElementById("pw-tabel-rincian");
-        tbody.innerHTML = "";
+        const tbody = document.getElementById("pw-tabel-rincian"); tbody.innerHTML = "";
         let sReg = 0, sOver = 0;
         dataLog.filter(l => l.nama === nama && l.bulan === bln).forEach(l => {
             sReg += l.reg; sOver += l.over;
-            let b = l.status === "Hadir" ? "success" : "warning";
             let tar = l.status === "Hadir" ? l.reg : l.over;
-            tbody.innerHTML += `<tr><td class="fw-bold">${l.hari}, ${l.tgl}</td><td><span class="badge bg-${b}">${l.status}</span></td><td>Rp ${tar.toLocaleString("id-ID")}</td></tr>`;
+            tbody.innerHTML += `<tr><td class="fw-bold">${l.hari}, ${l.tgl}</td><td><span class="badge bg-${l.status === "Hadir" ? "success" : "warning"}">${l.status}</span></td><td>Rp ${tar.toLocaleString("id-ID")}</td></tr>`;
         });
-        if (tbody.innerHTML === "") tbody.innerHTML = `<tr><td colspan="3" class="text-center text-muted">Belum ada data bulan ini.</td></tr>`;
         document.getElementById("pw-sum-reguler").innerText = `Rp ${sReg.toLocaleString("id-ID")}`;
         document.getElementById("pw-sum-overtime").innerText = `Rp ${sOver.toLocaleString("id-ID")}`;
         document.getElementById("pw-sum-total").innerText = `Rp ${(sReg + sOver).toLocaleString("id-ID")}`;
       }
+      function kembaliKeSearch() { document.getElementById("pw-detail-view").classList.add("d-none"); document.getElementById("pw-search-view").classList.remove("d-none"); }
 
-      function kembaliKeSearch() {
-        document.getElementById("pw-detail-view").classList.add("d-none");
-        document.getElementById("pw-search-view").classList.remove("d-none");
-        document.getElementById("inputCariWali").value = "";
-      }
-
-      // --- LOGIKA PORTAL ADMIN ---
+      // --- ADMIN LOGIN ---
       async function showAdminLogin() {
-          const { value: formValues } = await Swal.fire({
-            title: 'Login Admin',
-            html: '<label for="swal-user" class="visually-hidden">Username</label>' + 
-                  '<input id="swal-user" class="swal2-input" placeholder="Username">' +
-                  '<label for="swal-pass" class="visually-hidden">Password</label>' + 
-                  '<input id="swal-pass" type="password" class="swal2-input" placeholder="Password">',
-            focusConfirm: false, showCancelButton: true,
-            preConfirm: () => [document.getElementById('swal-user').value, document.getElementById('swal-pass').value]
+          const { value: form } = await Swal.fire({
+            title: 'Login', html: '<input id="su" class="swal2-input" placeholder="User"><input id="sp" type="password" class="swal2-input" placeholder="Pass">',
+            preConfirm: () => [document.getElementById('su').value, document.getElementById('sp').value]
           });
-
-          if (formValues) {
-            Swal.fire({title: 'Memeriksa...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() }});
-            google.script.run
-              .withSuccessHandler(res => {
-                  if(res.status) {
-                     Swal.fire('Berhasil', 'Selamat datang Admin', 'success');
-                     document.getElementById("portal-wali").classList.add("d-none");
-                     document.getElementById("portal-admin").classList.remove("d-none");
-                  } else { Swal.fire('Gagal', res.message, 'error'); }
-              })
-              .withFailureHandler(err => Swal.fire('Error Backend', err.message, 'error'))
-              .loginAdminBackend(formValues[0], formValues[1]);
+          if (form) {
+            Swal.fire({title: 'Memeriksa...', didOpen: () => Swal.showLoading()});
+            try {
+                const res = await apiCall("loginAdmin", { username: form[0], password: form[1] });
+                if(res.auth) {
+                    Swal.fire('Berhasil', '', 'success');
+                    document.getElementById("portal-wali").classList.add("d-none");
+                    document.getElementById("portal-admin").classList.remove("d-none");
+                } else Swal.fire('Gagal', res.message, 'error');
+            } catch (e) { Swal.fire('Error API', e.message, 'error'); }
           }
       }
-
-      function logoutAdmin() {
-          document.getElementById("portal-admin").classList.add("d-none");
-          document.getElementById("portal-wali").classList.remove("d-none");
-      }
-
-      function switchMenu(menuId, el) {
+      function logoutAdmin() { location.reload(); }
+      function switchMenu(id, el) {
           document.querySelectorAll('.menu-section').forEach(m => m.classList.add('d-none'));
-          document.getElementById(menuId).classList.remove('d-none');
+          document.getElementById(id).classList.remove('d-none');
           document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-          if(el) el.classList.add('active');
-          if(menuId !== 'menu-absen') stopScanner();
+          if(el) el.classList.add('active'); if(id !== 'menu-absen') stopScanner();
       }
 
-      // ==============================================================================
-      // SOLUSI JITU: SCANNER jsQR (Bebas Eval, Aman dari Pemblokiran CSP)
-      // ==============================================================================
-      let videoElement = document.getElementById("video");
-      let canvasElement = document.getElementById("canvasElement");
-      let canvas = canvasElement.getContext("2d", { willReadFrequently: true });
-      let scanning = false;
-      let streamTrack = null;
+      // --- SCANNER jsQR ---
+      let videoElement = document.getElementById("video"); let canvasElement = document.getElementById("canvasElement");
+      let canvas = canvasElement.getContext("2d", { willReadFrequently: true }); let scanning = false, streamTrack = null;
 
       function initScanner() {
-        document.getElementById("btnMulaiKamera").classList.add("d-none");
-        document.getElementById("btnStopKamera").classList.remove("d-none");
+        document.getElementById("btnMulaiKamera").classList.add("d-none"); document.getElementById("btnStopKamera").classList.remove("d-none");
         document.getElementById("reader-container").style.display = "block";
-
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(function(stream) {
-          streamTrack = stream;
-          videoElement.srcObject = stream;
-          videoElement.setAttribute("playsinline", true);
-          videoElement.play();
-          scanning = true;
-          requestAnimationFrame(tick);
-        }).catch(function(err) {
-          Swal.fire("Error Akses Kamera", "Pastikan browser mengizinkan akses kamera.", "error");
-          stopScanner();
-        });
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(stream => {
+          streamTrack = stream; videoElement.srcObject = stream; videoElement.play(); scanning = true; requestAnimationFrame(tick);
+        }).catch(err => Swal.fire("Error", "Akses kamera ditolak.", "error"));
       }
 
       function tick() {
         if (!scanning) return;
         if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
-          canvasElement.height = videoElement.videoHeight;
-          canvasElement.width = videoElement.videoWidth;
+          canvasElement.height = videoElement.videoHeight; canvasElement.width = videoElement.videoWidth;
           canvas.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
-          
           let imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
-          // Deteksi QR dengan jsQR
-          let code = jsQR(imageData.data, imageData.width, imageData.height, {
-            inversionAttempts: "dontInvert",
-          });
-
-          if (code && code.data) {
-            stopScanner();
-            simpanAbsenKeDatabase(code.data, 'Hadir');
-            return; // Hentikan loop scanning
-          }
+          let code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
+          if (code && code.data) { stopScanner(); simpanAbsenKeDatabase(code.data, 'Hadir'); return; }
         }
         requestAnimationFrame(tick);
       }
-
-      function stopScanner() {
-        scanning = false;
-        if (streamTrack) { streamTrack.getTracks().forEach(track => track.stop()); }
-        document.getElementById("reader-container").style.display = "none";
-        document.getElementById("btnMulaiKamera").classList.remove("d-none");
-        document.getElementById("btnStopKamera").classList.add("d-none");
-      }
+      function stopScanner() { scanning = false; if (streamTrack) streamTrack.getTracks().forEach(t => t.stop()); document.getElementById("reader-container").style.display = "none"; document.getElementById("btnMulaiKamera").classList.remove("d-none"); document.getElementById("btnStopKamera").classList.add("d-none"); }
 
       function simpanManual() {
-         const nama = document.getElementById("manualSiswa").value;
-         const tipe = document.getElementById("manualTipe").value;
+         const nama = document.getElementById("manualSiswa").value; const tipe = document.getElementById("manualTipe").value;
          if(!nama) return Swal.fire("Oops", "Isi Nama Siswa!", "warning");
          simpanAbsenKeDatabase(nama, tipe);
       }
 
-      function simpanAbsenKeDatabase(idAtauNama, tipe) {
-          Swal.fire({title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() }});
-          google.script.run
-            .withSuccessHandler(res => {
-                if(res.status) {
-                    Swal.fire('Sukses', res.message, 'success').then(() => {
-                        document.getElementById("loadingOverlay").style.display = "flex";
-                        google.script.run.withSuccessHandler(onDataLoaded).getAppData();
-                    });
-                } else { Swal.fire('Gagal', res.message, 'error'); }
-            })
-            .withFailureHandler(err => Swal.fire('Error Backend', err.message, 'error'))
-            .catatKehadiranBackend(idAtauNama, tipe);
+      async function simpanAbsenKeDatabase(idAtauNama, tipe) {
+          Swal.fire({title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
+          try {
+              const res = await apiCall("catatKehadiran", { idAtauNama: idAtauNama, tipe: tipe });
+              Swal.fire('Sukses', res.message, 'success').then(() => {
+                  document.getElementById("loadingOverlay").style.display = "flex";
+                  fetchBackendData(); // Ambil data terbaru
+              });
+          } catch(e) { Swal.fire('Gagal', e.message, 'error'); }
       }
     </script>
   </body>
