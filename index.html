@@ -771,29 +771,52 @@
         kembaliKeSearch();
       }
 
-      // LOAD DATA DARI GAS KE MEMORI LOKAL
+      // -------------------------------------------------------------
+      // OPTIMASI: FUNGSI BANTUAN UNTUK MERENDER ULANG UI (INSTAN)
+      // -------------------------------------------------------------
+      function refreshUIAfterLoad() {
+        const dlist = document.getElementById("listSiswaSuggestion");
+        dlist.innerHTML = "";
+        STATE.siswa.forEach((s) => { dlist.innerHTML += `<option value="${s.nama}">ID: ${s.id}</option>`; });
+
+        updateDashboardView();
+        renderTabelSiswa();
+        renderTabelTarif();
+        filterLog();
+        filterLaporan();
+      }
+
+      // -------------------------------------------------------------
+      // OPTIMASI 1: SWR CACHING (MEMUAT DATA SECARA INSTAN)
+      // -------------------------------------------------------------
       async function loadDataAdmin(isRefresh = false) {
-        if(isRefresh) Swal.showLoading();
-        else Swal.fire({ title: 'Memuat Database...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+        if (isRefresh) {
+          Swal.showLoading();
+        } else {
+          // Coba muat dari Local Storage terlebih dahulu untuk respon UI 0 Detik
+          const cachedData = localStorage.getItem('smartabsen_data');
+          if (cachedData) {
+            STATE = JSON.parse(cachedData);
+            refreshUIAfterLoad();
+            // Menampilkan indikator sinkronisasi background ringan
+            Swal.fire({toast: true, position: 'top-end', title: 'Sinkronisasi data latar...', showConfirmButton: false, timer: 1500});
+          } else {
+            Swal.fire({ title: 'Memuat Database...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+          }
+        }
         
+        // Tetap tarik dari GAS untuk mendapatkan pembaruan terbaru (Background Sync)
         const data = await callGAS({ action: 'getAdminData' });
         
         if (data) {
           STATE = data;
-          
-          // Populate suggestions
-          const dlist = document.getElementById("listSiswaSuggestion");
-          dlist.innerHTML = "";
-          STATE.siswa.forEach((s) => { dlist.innerHTML += `<option value="${s.nama}">ID: ${s.id}</option>`; });
-
-          updateDashboardView();
-          renderTabelSiswa();
-          renderTabelTarif();
-          filterLog();
-          filterLaporan();
+          localStorage.setItem('smartabsen_data', JSON.stringify(STATE)); // Simpan ke Cache
+          refreshUIAfterLoad();
           
           if(isRefresh) Swal.fire({toast: true, position: 'top-end', icon: 'success', title: 'Data diperbarui!', timer: 1500, showConfirmButton: false});
           else Swal.close();
+        } else if (!isRefresh && !localStorage.getItem('smartabsen_data')) {
+          Swal.fire('Error', 'Gagal memuat database awal', 'error');
         }
       }
 
@@ -805,15 +828,18 @@
         let sesiOvertime = 0;
         let income = 0;
 
-        const todayStr = new Date().toLocaleDateString("en-GB"); // Format DD/MM/YYYY
+        // Pencarian "Hadir Hari Ini" diubah agar lebih robust (contoh format tanggal: '07 Okt 2023')
+        const todayDay = String(new Date().getDate()).padStart(2, '0');
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        const todayMonth = months[new Date().getMonth()];
+        const todaySearch = `${todayDay} ${todayMonth}`;
 
         STATE.log.forEach(l => {
           if (l.bulan === bln) {
             if (l.status === 'Overtime') sesiOvertime++;
             income += (l.reg + l.over);
           }
-          // Hitung hadir hari ini (Cek string Tgl)
-          if (l.tglStr.includes(new Date().getDate() + " " + new Date().toLocaleString('id', {month: 'short'}))) {
+          if (l.tglStr.includes(todaySearch)) {
              hadirHariIni++;
           }
         });
@@ -883,6 +909,39 @@
         });
       }
 
+      // -------------------------------------------------------------
+      // OPTIMASI 2: OPTIMISTIC UI (INJECT DATA BARU TANPA LOADING)
+      // -------------------------------------------------------------
+      function appendLogLokal(res, idSiswa, tipe) {
+        const now = new Date();
+        const hariArr = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        
+        const day = String(now.getDate()).padStart(2, '0');
+        const time = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0');
+        const formattedDateStr = `${day} ${months[now.getMonth()]} ${now.getFullYear()} ${time}`; // Mirip format GAS
+
+        const newLog = {
+          idLog: 'LOG-' + now.getTime(),
+          tglStr: formattedDateStr,
+          bulan: now.toISOString().slice(0, 7),
+          idSiswa: idSiswa,
+          nama: res.nama,
+          hari: hariArr[now.getDay()],
+          status: tipe,
+          reg: tipe === 'Hadir' ? res.tarifDikenakan : 0,
+          over: tipe === 'Overtime' ? res.tarifDikenakan : 0
+        };
+        
+        STATE.log.unshift(newLog); // Suntik ke data paling atas (memori)
+        localStorage.setItem('smartabsen_data', JSON.stringify(STATE)); // Perbarui cache
+        
+        // Segera render ulang komponen terkait secara instan
+        updateDashboardView();
+        filterLog();
+        filterLaporan();
+      }
+
       // --- ABSENSI & SCANNER ---
       let html5QrcodeScanner = null;
       function initScanner() {
@@ -893,11 +952,13 @@
             stopScanner();
             Swal.showLoading();
             
-            // Proses Kehadiran QR = Default Tipe Hadir
+            // Mengirim data ke server
             const res = await callGAS({ action: 'catatAbsen', idSiswa: decodedText, tipe: 'Hadir' });
             if (res) {
                Swal.fire("Berhasil Absen!", `${res.nama} hadir. Tarif Rp ${res.tarifDikenakan.toLocaleString('id-ID')} dicatat.`, "success");
-               loadDataAdmin(true); // Auto refresh data di belakang layar
+               
+               // OPTIMASI: Update UI langsung secara Instan (tidak usah panggil loadDataAdmin(true) lagi)
+               appendLogLokal(res, decodedText, 'Hadir'); 
             }
           }, () => {});
         }
@@ -927,7 +988,9 @@
           Swal.fire("Berhasil", `Kehadiran manual (${tipe}) untuk ${res.nama} dicatat. Tarif: Rp ${res.tarifDikenakan.toLocaleString('id-ID')}`, "success");
           document.getElementById("manualSiswa").value = "";
           document.getElementById("manualNominalOvertime").value = "";
-          loadDataAdmin(true);
+          
+          // OPTIMASI: Update UI langsung secara Instan
+          appendLogLokal(res, idSiswa, tipe); 
         }
       }
 
